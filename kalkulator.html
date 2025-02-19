@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesKalkulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            background-color: black;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #222;
+            padding: 10px;
+            color: white;
+            transition: width 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar.minimized {
+            width: 60px;
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo i {
+            margin-right: 5px;
+        }
+
+        .sidebar button {
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            background-color: #444;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .sidebar button i {
+            margin-right: 10px;
+            display: block;
+        }
+
+        .sidebar button span {
+            display: inline;
+        }
+
+        .sidebar.minimized button span {
+            display: none;
+        }
+
+        .sidebar button:hover {
+            background-color: #A45DFF;
+        }
+
+        .active {
+            background-color: #A45DFF;
+        }
+
+        .calculator-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #333;
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            flex: 1;
+        }
+
+        .display {
+            grid-column: span 4;
+            background-color: #444;
+            color: #fff;
+            text-align: right;
+            font-size: 42px;
+            padding: 40px;
+            border: none;
+            border-radius: 10px;
+            overflow-x: hidden;
+            white-space: nowrap;
+            margin-bottom: 15px;
+            max-width: 100%;
+        }
+
+        .button {
+            height: 100%;
+            font-size: 24px;
+            border: none;
+            background-color: #5A5A5A;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            background-color: #7A7A7A;
+        }
+
+        .operator {
+            background-color: #A45DFF;
+        }
+
+        .operator:hover {
+            background-color: #8E4BC1;
+        }
+
+        .history {
+            background-color: #222;
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+            overflow-y: auto;
+            max-height: 150px;
+        }
+
+        .input-field, .unit-selector {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .warning {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        #discountCalculator, #volumeConverter {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #444;
+        }
+
+        .toggle-sidebar {
+            background-color: #444;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .toggle-sidebar:hover {
+            background-color: #555;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar.minimized {
+                width: 60px;
+            }
+
+            .sidebar button span {
+                display: none;
+            }
+
+            .sidebar button i {
+                margin-right: 0;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .sidebar.minimized {
+                width: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .display {
+                font-size: 18px;
+            }
+        }
+
+ .discount-button {
+    height: 40px; /* Set a smaller height */
+    font-size: 16px; /* Adjust font size */
+    border: none;
+    background-color: #A45DFF; /* Matching color */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px; /* Slightly rounded corners */
+    width: 100px; /* Fixed width for uniformity */
+    margin: 5px; /* Space around buttons */
+}
+
+.discount-button:hover {
+    background-color: #8E4BC1; /* Darker shade on hover */
+}
+ .volume-button {
+    height: 40px; /* Set a smaller height */
+    font-size: 16px; /* Adjust font size */
+    border: none;
+    background-color: #A45DFF; /* Matching color */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px; /* Slightly rounded corners */
+    width: 100px; /* Fixed width for uniformity */
+    margin: 5px; /* Space around buttons */
+}
+
+.volume-button:hover {
+    background-color: #8E4BC1; /* Darker shade on hover */
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* This will place the buttons at opposite ends */
+    margin-top: 10px; /* Added margin for spacing */
+    margin-left: 6px; /* Added margin for spacing */
+    margin-right: 6px; /* Added margin for spacing */
+}
+.input-field, .unit-selector {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+
+    </style>
+</head>
+<body>
+<div class="sidebar minimized" id="sidebar">
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-arrow-right"></i><span>Minimize</span>
+    </button>
+    <button id="basicMode" class="active" onclick="setMode('basic')">
+        <i class="fas fa-calculator"></i><span>Standard</span>
+    </button>
+    <button id="discountMode" onclick="setMode('discount')">
+        <i class="fas fa-percent"></i><span>Diskon</span>
+    </button>
+    <button id="volumeMode" onclick="setMode('volume')">
+        <i class="fas fa-tachometer-alt"></i><span>Volume</span>
+    </button>
+    <button id="historyToggle" onclick="toggleHistory()">
+        <i class="fas fa-history"></i><span>History</span>
+    </button>
+    <button onclick="clearHistory()">
+        <i class="fas fa-trash"></i><span>Clear History</span>
+    </button>
+</div>
+<div class="calculator-container" id="calculatorContainer">
+    <div class="display" id="display">0</div>
+    <div class="calculator" id="calculator">
+        <button class="button operator" onclick="appendToDisplay('/')">÷</button>
+        <button class="button operator" onclick="setPercentageMode()">%</button>
+        <button class="button operator" onclick="clearDisplay()">C</button>
+        <button class="button operator" onclick="backspace()">⌫</button>
+        <button class="button operator" onclick="appendToDisplay('*')">×</button>
+        <button class="button" onclick="appendToDisplay('7')">7</button>
+        <button class="button" onclick="appendToDisplay('8')">8</button>
+        <button class="button" onclick="appendToDisplay('9')">9</button>
+        <button class="button operator" onclick="appendToDisplay('+')">+</button>
+        <button class="button" onclick="appendToDisplay('4')">4</button>
+        <button class="button" onclick="appendToDisplay('5')">5</button>
+        <button class="button" onclick="appendToDisplay('6')">6</button>
+        <button class="button operator" onclick="appendToDisplay('-')">-</button>
+        <button class="button" onclick="appendToDisplay('1')">1</button>
+        <button class="button" onclick="appendToDisplay('2')">2</button>
+        <button class="button" onclick="appendToDisplay('3')">3</button>
+        <button class="button operator" onclick="calculate()">=</button>
+        <button class="button" onclick="appendToDisplay('0')">0</button>
+        <button class="button" onclick="appendToDisplay(',')">,</button>
+        <button class="button" onclick="toggleSign()">±</button>
+    </div>
+
+    <div id="discountCalculator">
+        <input type="text" class="input-field" id="originalPrice" placeholder="Harga Asli" />
+<input type="text" class="input-field" id="discountPercentage" placeholder="Besar Diskon (%)" />
+        <div class="warning" id="warningMessage"></div>
+        <div class="button-container">
+    <button class="button discount-button" onclick="clearDisplay()">C</button>
+    <button class="button discount-button" onclick="calculateDiscount()">Hitung</button>
+</div>
+    </div>
+
+<div id="volumeConverter">
+    <input type="text" class="input-field" id="volumeInput" placeholder="Masukkan nilai" />
+    <span style="color: white; margin-left: 10px;"> From: </span> <!-- Changed color to white -->
+    <select id="volumeUnitFrom" class="unit-selector">
+        <option value="l">Liter(l)</option>
+        <option value="ml">Mililiter(ml)</option>
+        <option value="gal">Gallon(gal)</option>
+        <option value="qt">Quart</option>
+        <option value="cc">Centimeter Kubik(cc)</option>
+        <option value="m3">Meter Kubik(m³)</option>
+    </select>
+    <span style="color: white; margin-left: 10px;"> To: </span> <!-- Changed color to white -->
+    <select id="volumeUnitTo" class="unit-selector">
+        <option value="l">Liter(l)</option>
+        <option value="ml">Mililiter(ml)</option>
+        <option value="gal">Gallon(gal)</option>
+        <option value="qt">Quart</option>
+        <option value="cc">Centimeter Kubik(cc)</option>
+        <option value="m3">Meter Kubik(m³)</option>
+    </select>
+   <div class="button-container" style="display: flex; justify-content: space-between; margin-top: 10px;">
+        <button class="button volume-button" style="margin-left: 10px;" onclick="convertVolume()">Konversi</button> <!-- Added margin-left -->
+        <button class="button volume-button" style="margin-left: 10px;" onclick="clearDisplay()">C</button>
+    </div>
+</div>
+
+    <div class="history" id="history" style="display: none;"></div>
+</div>
+
+<script>
+    const historyArray = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+    let currentMode = 'basic'; // Start in basic mode
+
+    document.addEventListener('keydown', function(event) {
+    const key = event.key;
+
+    // Check if Ctrl key is pressed
+    const isCtrlPressed = event.ctrlKey;
+
+    // Prevent default action for "Ctrl +" and "Ctrl -"
+    if ((isCtrlPressed && key === '+') || (isCtrlPressed && key === '-')) {
+        event.preventDefault();
+        return; // Exit early
+    }
+
+    // Get the current mode
+    const isInDiscountMode = currentMode === 'discount';
+    const isInVolumeMode = currentMode === 'volume';
+    
+    // Allow numbers, operators, and some special keys
+    if (/^[0-9]$/.test(key)) {
+        if (isInDiscountMode) {
+            // Append to the original price or discount percentage input
+            const activeInput = document.activeElement;
+            if (activeInput === document.getElementById('originalPrice')) {
+                appendToInput(activeInput, key);
+            } else if (activeInput === document.getElementById('discountPercentage')) {
+                appendToInput(activeInput, key);
+            } 
+        } else if (isInVolumeMode) {
+            const volumeInput = document.getElementById('volumeInput');
+            if (document.activeElement === volumeInput) {
+                appendToInput(volumeInput, key);
+            }
+        } else {
+            appendToDisplay(key);
+        }
+    } else if (key === 'Enter' || key === '=') {
+        if (isInDiscountMode) {
+            calculateDiscount();
+        } else if (isInVolumeMode) {
+            convertVolume();
+        } else {
+            calculate();
+        }
+    } else if (key === 'Backspace') {
+        if (isInDiscountMode) {
+            const activeInput = document.activeElement;
+            if (activeInput === document.getElementById('originalPrice') || activeInput === document.getElementById('discountPercentage')) {
+                handleBackspace(activeInput);
+            }
+        } else if (isInVolumeMode) {
+            handleBackspace(document.getElementById('volumeInput'));
+        } else {
+            backspace();
+        }
+} else if (['+', '-', '*', '/', '%'].includes(key)) {
+    appendToDisplay(key);
+    } else if (key === ',') {
+        appendToDisplay(',');
+    } else if (key === 'c' || key === 'C') {
+        clearDisplay();
+    }
+});
+
+function toggleSign() {
+    const display = document.getElementById('display');
+    let currentValue = display.innerText.replace(/\./g, '').replace(',', '.');
+
+    // Check if the current value is '0'
+    if (currentValue === '0') {
+        return; // Do nothing if the display shows 0
+    }
+
+    // Parse the current value to a number
+    const numberValue = parseFloat(currentValue);
+
+    // Toggle sign
+    const newValue = numberValue * -1;
+
+    // Update the display
+    display.innerText = formatNumber(newValue.toString().replace('.', ','));
+}
+
+
+function handleBackspace(inputField) {
+    inputField.value = inputField.value.slice(0, -1); // Remove the last character
+}
+
+    function backspace() {
+        const display = document.getElementById('display');
+        let currentValue = display.innerText.replace(/\./g, '');
+        if (currentValue.length > 1) {
+            currentValue = currentValue.slice(0, -1);
+        } else {
+            currentValue = '0';
+        }
+        display.innerText = formatNumber(currentValue);
+        display.scrollLeft = display.scrollWidth;
+    }
+
+    function formatInput(input) {
+        const value = input.value.replace(/\./g, '').replace(',', '.');
+        const formattedValue = Number(value).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        input.value = formattedValue;
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('calculator').style.display = mode === 'basic' ? 'grid' : 'none';
+        document.getElementById('discountCalculator').style.display = mode === 'discount' ? 'block' : 'none';
+        document.getElementById('volumeConverter').style.display = mode === 'volume' ? 'block' : 'none';
+        clearDisplay();
+
+        // Set active class
+        document.getElementById('basicMode').classList.remove('active');
+        document.getElementById('discountMode').classList.remove('active');
+        document.getElementById('volumeMode').classList.remove('active');
+
+        if (mode === 'basic') {
+            document.getElementById('basicMode').classList.add('active');
+        } else if (mode === 'discount') {
+            document.getElementById('discountMode').classList.add('active');
+        } else if (mode === 'volume') {
+            document.getElementById('volumeMode').classList.add('active');
+        }
+    }
+
+    function clearDisplay() {
+        document.getElementById('display').innerText = '0';
+        document.getElementById('originalPrice').value = '';
+        document.getElementById('discountPercentage').value = '';
+        document.getElementById('warningMessage').innerText = '';
+        document.getElementById('volumeInput').value = '';
+    }
+
+    function appendToDisplay(value) {
+        const display = document.getElementById('display');
+        let currentValue = display.innerText.replace(/\./g, '');
+
+        if (value === ',') {
+            if (!currentValue.includes(',')) {
+                currentValue += ',';
+            }
+        } else {
+            const lastChar = currentValue[currentValue.length - 1];
+            const operators = ['+', '-', '*', '/', '%'];
+
+            if (operators.includes(value)) {
+                if (operators.includes(lastChar) || (value === '%' && lastChar === '%')) {
+                    return;
+                }
+            }
+
+            // Limit to 16 digits
+            if (currentValue === '0') {
+                currentValue = value;
+            } else if (currentValue.length < 16) {
+                currentValue += value;
+            }
+        }
+
+        display.innerText = formatNumber(currentValue);
+        display.scrollLeft = display.scrollWidth; // Automatically scroll to the right
+    }
+
+    function calculate() {
+        const display = document.getElementById('display');
+        let result;
+
+        try {
+            result = eval(display.innerText.replace(/\./g, '').replace(',', '.'));
+            if (result !== 0) {
+                addToHistory(display.innerText + " = " + result);
+            }
+            display.innerText = formatNumber(result.toString().replace('.', ',')).slice(0, 16);
+        } catch (error) {
+            display.innerText = 'Error';
+        }
+    }
+
+    function formatNumber(num) {
+        return num.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function setPercentageMode() {
+        const display = document.getElementById('display');
+        let currentValue = parseFloat(display.innerText.replace(/\./g, '').replace(',', '.'));
+
+        if (!isNaN(currentValue)) {
+            const result = currentValue / 100;
+            display.innerText = formatNumber(result.toString().replace('.', ','));
+            addToHistory(`${currentValue} % = ${result}`);
+        }
+    }
+
+document.getElementById('originalPrice').addEventListener('input', function() {
+    formatInput(this);
+});
+
+function calculateDiscount() {
+    const originalPrice = parseFloat(document.getElementById('originalPrice').value.replace(/\./g, '').replace(',', '.'));
+    const discountPercentage = parseFloat(document.getElementById('discountPercentage').value);
+    const warningMessage = document.getElementById('warningMessage');
+
+    // Clear previous warning messages
+    warningMessage.innerText = '';
+
+    // Validate input
+    if (isNaN(originalPrice) || originalPrice < 0) {
+        warningMessage.innerText = "Harap masukkan harga yang valid dan tidak negatif.";
+        return;
+    }
+
+    if (isNaN(discountPercentage) || discountPercentage <= 0 || discountPercentage >= 100) {
+        warningMessage.innerText = "Persentase diskon harus lebih dari 0% dan kurang dari 100%.";
+        return;
+    }
+
+    // Calculate discount
+    const discountValue = (originalPrice * discountPercentage) / 100;
+    const finalValue = originalPrice - discountValue;
+
+    // Update the display only after calculation
+    document.getElementById('display').innerText = formatNumber(finalValue.toString().replace('.', ','));
+
+    // Add to history if final value is not zero
+    if (finalValue !== 0) {
+        addToHistory(`Diskon ${discountPercentage}% dari ${originalPrice} = ${finalValue}`);
+    }
+}
+
+    function convertVolume() {
+    const volumeInput = parseFloat(document.getElementById('volumeInput').value);
+    const volumeUnitFrom = document.getElementById('volumeUnitFrom').value;
+    const volumeUnitTo = document.getElementById('volumeUnitTo').value;
+    const display = document.getElementById('display');
+
+    if (isNaN(volumeInput)) {
+        display.innerText = 'Masukkan nilai yang valid';
+        return;
+    }
+
+    let convertedValue;
+
+    switch (volumeUnitFrom) {
+        case 'l':
+            convertedValue = volumeInput; // already in liters
+            break;
+        case 'ml':
+            convertedValue = volumeInput / 1000; // convert milliliters to liters
+            break;
+        case 'gal':
+            convertedValue = volumeInput * 3.78541; // convert gallons to liters
+            break;
+        case 'qt':
+            convertedValue = volumeInput * 0.946353; // convert quarts to liters
+            break;
+        case 'cc':
+            convertedValue = volumeInput / 1000; // convert cc to liters
+            break;
+        case 'm3':
+            convertedValue = volumeInput * 1000; // convert cubic meters to liters
+            break;
+        default:
+            display.innerText = 'Unit tidak dikenal';
+            return;
+    }
+
+    let resultText;
+    switch (volumeUnitTo) {
+        case 'l':
+            resultText = formatNumber(convertedValue.toFixed(2)) + ' L';
+            break;
+        case 'ml':
+            resultText = formatNumber((convertedValue * 1000).toFixed(2)) + ' mL';
+            break;
+        case 'gal':
+            resultText = formatNumber((convertedValue / 3.78541).toFixed(2)) + ' gal';
+            break;
+        case 'qt':
+            resultText = formatNumber((convertedValue / 0.946353).toFixed(2)) + ' qt';
+            break;
+        case 'cc':
+            resultText = formatNumber((convertedValue * 1000).toFixed(2)) + ' cc'; // convert back to cc
+            break;
+        case 'm3':
+            resultText = formatNumber((convertedValue / 1000).toFixed(2)) + ' m³'; // convert back to m³
+            break;
+        default:
+            display.innerText = 'Unit tidak dikenal';
+            return;
+    }
+
+    // Update display and add to history
+    display.innerText = resultText;
+    addToHistory(`Konversi ${volumeInput} ${volumeUnitFrom} = ${resultText}`);
+}
+
+    function addToHistory(entry) {
+        historyArray.push(entry);
+        localStorage.setItem('calculatorHistory', JSON.stringify(historyArray));
+        updateHistoryDisplay();
+    }
+
+    function updateHistoryDisplay() {
+        const history = document.getElementById('history');
+        history.innerHTML = historyArray.map(item => `<div>${item}</div>`).join('');
+    }
+
+    function toggleHistory() {
+        const history = document.getElementById('history');
+        history.style.display = history.style.display === 'none' ? 'block' : 'none';
+        updateHistoryDisplay();
+    }
+
+    function clearHistory() {
+        localStorage.removeItem('calculatorHistory');
+        historyArray.length = 0; // Clear the array
+        updateHistoryDisplay();
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('minimized');
+    }
+
+    // Initialize the display
+    clearDisplay();
+</script>
+</body>
+</html>
